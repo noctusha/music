@@ -1,0 +1,246 @@
+basePath: /
+definitions:
+  handlers.JSON:
+    properties:
+      error:
+        type: string
+      song:
+        items:
+          $ref: '#/definitions/models.Song'
+        type: array
+      text:
+        type: string
+    type: object
+  models.EditSongPayload:
+    properties:
+      song:
+        $ref: '#/definitions/models.Song'
+      song_details:
+        $ref: '#/definitions/models.SongDetails'
+    type: object
+  models.NewSongPayload:
+    properties:
+      group:
+        example: Muse
+        type: string
+      song:
+        example: Supermassive Black Hole
+        type: string
+    type: object
+  models.Song:
+    properties:
+      group_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.SongDetails:
+    properties:
+      id:
+        type: integer
+      link:
+        type: string
+      release_date:
+        type: string
+      song_id:
+        type: integer
+      text:
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: API for managing an online song library
+  title: Online Song Library
+  version: "1.0"
+paths:
+  /api/songs:
+    get:
+      consumes:
+        - application/json
+      description: Returns a list of songs with filtering and pagination
+      parameters:
+        - description: Group name
+          in: query
+          name: group
+          type: string
+        - description: Song name
+          in: query
+          name: name
+          type: string
+        - description: Release date
+          in: query
+          name: releaseDate
+          type: string
+        - description: Song text
+          in: query
+          name: text
+          type: string
+        - description: Song link
+          in: query
+          name: link
+          type: string
+        - description: Limit
+          in: query
+          name: limit
+          type: integer
+        - description: Offset
+          in: query
+          name: offset
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+      summary: Get list of songs
+      tags:
+        - songs
+  /api/songs/{song_id}/delete:
+    delete:
+      consumes:
+        - application/json
+      description: Deletes a song by ID
+      parameters:
+        - description: Song ID
+          in: path
+          name: song_id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+      summary: Delete a song
+      tags:
+        - songs
+  /api/songs/{song_id}/edit:
+    patch:
+      consumes:
+        - application/json
+      description: Edits song data by ID
+      parameters:
+        - description: Song ID
+          in: path
+          name: song_id
+          required: true
+          type: string
+        - description: Song data
+          in: body
+          name: song
+          required: true
+          schema:
+            $ref: '#/definitions/models.EditSongPayload'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+      summary: Edit song data
+      tags:
+        - songs
+  /api/songs/{song_id}/text:
+    get:
+      consumes:
+        - application/json
+      description: Returns the text of a song with pagination over verses
+      parameters:
+        - description: Song ID
+          in: path
+          name: song_id
+          required: true
+          type: string
+        - description: Page number
+          in: query
+          name: page
+          type: integer
+        - description: Number of verses per page
+          in: query
+          name: limit
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+      summary: Get song text
+      tags:
+        - songs
+  /api/songs/new:
+    post:
+      consumes:
+        - application/json
+      description: Adds a new song and saves it to the database
+      parameters:
+        - description: New song
+          in: body
+          name: song
+          required: true
+          schema:
+            $ref: '#/definitions/models.NewSongPayload'
+      produces:
+        - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Song'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.JSON'
+      summary: Add a new song
+      tags:
+        - songs
+swagger: "2.0"
